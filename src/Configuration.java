@@ -28,8 +28,8 @@ public class Configuration {
             , CommonProperties commonProperties) {
         try {
             Peer thisPeer = peers.get(thisPeerId);
-            int fileSize = commonProperties.getFileSize();
-            int pieceSize = commonProperties.getPieceSize();
+            int fileSize = commonProperties.getSize('f');
+            int pieceSize = commonProperties.getSize('p');
             int numberOfPieces = commonProperties.getNumberOfPieces();
             int[] bitField = new int[numberOfPieces];
             byte[][] filePieces = new byte[numberOfPieces][];
@@ -77,12 +77,12 @@ public class Configuration {
                     new BufferedReader(new FileReader("Common.cfg"));
 
             Object[] commonLines = commonInfo.lines().toArray();
-            commonProperties.setPreferredNeighbors(Integer.parseInt(commonLines[0].toString().split(" ")[1]));
-            commonProperties.setUnchokingInterval(Integer.parseInt(commonLines[1].toString().split(" ")[1]));
-            commonProperties.setOptimisticUnchokingInterval(Integer.parseInt(commonLines[2].toString().split(" ")[1]));
+            commonProperties.setNeighborsPreferred(Integer.parseInt(commonLines[0].toString().split(" ")[1]));
+            commonProperties.setInterval('u', Integer.parseInt(commonLines[1].toString().split(" ")[1]));
+            commonProperties.setInterval('o', Integer.parseInt(commonLines[2].toString().split(" ")[1]));
             commonProperties.setFileName(commonLines[3].toString().split(" ")[1]);
-            commonProperties.setFileSize(Integer.parseInt(commonLines[4].toString().split(" ")[1]));
-            commonProperties.setPieceSize(Integer.parseInt(commonLines[5].toString().split(" ")[1]));
+            commonProperties.setSize('f', Integer.parseInt(commonLines[4].toString().split(" ")[1]));
+            commonProperties.setSize('p', Integer.parseInt(commonLines[5].toString().split(" ")[1]));
         } catch (IOException e) {
             e.printStackTrace();
         }

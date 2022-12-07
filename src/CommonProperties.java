@@ -1,60 +1,60 @@
+import java.util.*;
+
 class CommonProperties {
-    private int preferredNeighbors;
-    private int unchokingInterval;
-    private int optimisticUnchokingInterval;
-    private String fileName;
-    private int fileSize;
-    private int pieceSize;
 
-    public int getPreferredNeighbors() {
-        return preferredNeighbors;
+    String fileName;
+    Map<String, Integer> properties;
+
+    public CommonProperties() {
+        properties = new HashMap<>();
+        properties.putIfAbsent(Constants.neighboursPreferred, 0);
+        properties.putIfAbsent(Constants.intervalForUnchoking, 0);
+        properties.putIfAbsent(Constants.intervalForOptimisticUnchoking, 0);
+        properties.putIfAbsent(Constants.sizeOfFlie, 0);
+        properties.putIfAbsent(Constants.sizeOfPiece, 0);
     }
 
-    public void setPreferredNeighbors(int preferredNeighbors) {
-        this.preferredNeighbors = preferredNeighbors;
+    public int getNeighborsPreferred() {
+        return this.properties.get(Constants.neighboursPreferred);
     }
 
-    public int getUnchokingInterval() {
-        return unchokingInterval;
+    public void setNeighborsPreferred(int neighboursPreferred) {
+        this.properties.put(Constants.neighboursPreferred, neighboursPreferred);
     }
 
-    public void setUnchokingInterval(int unchokingInterval) {
-        this.unchokingInterval = unchokingInterval;
+    public int getInterval(char type) {
+        String intervalType = type == 'u' ? Constants.intervalForUnchoking : Constants.intervalForOptimisticUnchoking;
+        int interval = this.properties.get(intervalType);
+        return interval; 
     }
 
-    public int getOptimisticUnchokingInterval() {
-        return optimisticUnchokingInterval;
-    }
-
-    public void setOptimisticUnchokingInterval(int optimisticUnchokingInterval) {
-        this.optimisticUnchokingInterval = optimisticUnchokingInterval;
+    public void setInterval(char type, int interval) {
+        String intervalType = type == 'u' ? Constants.intervalForUnchoking : Constants.intervalForOptimisticUnchoking;
+        this.properties.put(intervalType, interval);
+        return;
     }
 
     public String getFileName() {
-        return fileName;
+        return this.fileName;
     }
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
-    public int getFileSize() {
-        return fileSize;
+    public int getSize(char type) {
+        String objectType = type == 'f' ? Constants.sizeOfFlie : Constants.sizeOfPiece;
+        int size = this.properties.get(objectType);
+        return size;
     }
 
-    public void setFileSize(int fileSize) {
-        this.fileSize = fileSize;
-    }
-
-    public int getPieceSize() {
-        return pieceSize;
-    }
-
-    public void setPieceSize(int pieceSize) {
-        this.pieceSize = pieceSize;
+    public void setSize(char type, int size) {
+        String objectType = type == 'f' ? Constants.sizeOfFlie : Constants.sizeOfPiece;
+        this.properties.put(objectType, size);
+        return;
     }
 
     public int getNumberOfPieces() {
-        return (int) Math.ceil((double) fileSize / pieceSize);
+        return (int) Math.ceil((double) this.getSize('f') / this.getSize('p'));
     }
 }

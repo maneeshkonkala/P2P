@@ -32,12 +32,12 @@ public class PeerProcess {
             //Setup common info
             commonProperties = Configuration.getCommonProperties();
             numberOfPieces = commonProperties.getNumberOfPieces();
-            System.out.println("Number Of Preferred Neighbors : " + commonProperties.getPreferredNeighbors());
-            System.out.println("Unchoking Interval : " + commonProperties.getUnchokingInterval() + " seconds");
-            System.out.println("Optimistic Unchoking Interval : " + commonProperties.getOptimisticUnchokingInterval() + " seconds");
+            System.out.println("Number Of Preferred Neighbors : " + commonProperties.getNeighborsPreferred());
+            System.out.println("Unchoking Interval : " + commonProperties.getInterval('u') + " seconds");
+            System.out.println("Optimistic Unchoking Interval : " + commonProperties.getInterval('o') + " seconds");
             System.out.println("File Name : " + commonProperties.getFileName());
-            System.out.println("File Size : " + commonProperties.getFileSize());
-            System.out.println("Piece Size : " + commonProperties.getPieceSize());
+            System.out.println("File Size : " + commonProperties.getSize('f'));
+            System.out.println("Piece Size : " + commonProperties.getSize('p'));
             System.out.println("\n");
 
 
@@ -150,7 +150,7 @@ public class PeerProcess {
         public void run() {
             try {
                 while (peersWithCompleteFile < peers.size()) {
-                    int preferredNeighbors = commonProperties.getPreferredNeighbors();
+                    int preferredNeighbors = commonProperties.getNeighborsPreferred();
                     ArrayList<Integer> interestedPeers = new ArrayList<>();
                     ArrayList<Integer> preferredPeers = new ArrayList<>();
 
@@ -204,7 +204,7 @@ public class PeerProcess {
                     if (!preferredPeers.isEmpty())
                         System.out.println(LogWriter.changePreferredNeighbors(preferredPeers));
 
-                    Thread.sleep(commonProperties.getUnchokingInterval() * 1000L);
+                    Thread.sleep(commonProperties.getInterval('u') * 1000L);
                 }
             } catch (Exception e) {
 //                e.printStackTrace();
@@ -235,7 +235,7 @@ public class PeerProcess {
                     if (randomPeerId != 0)
                         System.out.println(LogWriter.changeOptimisticallyUnchokedNeighbor(randomPeerId));
 
-                    Thread.sleep(commonProperties.getOptimisticUnchokingInterval() * 1000L);
+                    Thread.sleep(commonProperties.getInterval('o') * 1000L);
                 }
             } catch (Exception e) {
 //                e.printStackTrace();
@@ -263,7 +263,7 @@ public class PeerProcess {
 
         public void checkIfCompleteFileDownloaded() {
             int parts = 0;
-            byte[] mergedFile = new byte[commonProperties.getFileSize()];
+            byte[] mergedFile = new byte[commonProperties.getSize('f')];
             for (int bit : thisPeer.getBitField()) {
                 if (bit == 1)
                     parts += 1;
