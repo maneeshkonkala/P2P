@@ -6,4 +6,12 @@ public class Constants {
     static String intervalForOptimisticUnchoking = "intervalForOptimisticUnchoking";
     static String sizeOfFlie = "sizeOfFlie";
     static String sizeOfPiece = "sizeOfPiece";
+    static String fileNameOfPeerInfoConfiguration = "PeerInfo.cfg";
+    static String fileNameOfCommonConfiguration = "Common.cfg";
+    static String space = " ";
+    static char file = 'f';
+    static char piece = 'p';
+    static char unchoking = 'u';
+    static char optimisticUnchoking = 'o';
+    static String peerFileNamePrefix = "peer_";
 }

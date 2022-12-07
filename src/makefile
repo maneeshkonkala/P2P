@@ -20,11 +20,14 @@ Messages.class: Messages.java
 LogWriter.class: LogWriter.java
 	$(JCC) $(JFLAGS) LogWriter.java
 
-Configuration.class: Configuration.java
-	$(JCC) $(JFLAGS) Configuration.java
+Setup.class: Setup.java
+	$(JCC) $(JFLAGS) Setup.java
 
-CommonProperties.class: Props.java
+Props.class: Props.java
 	$(JCC) $(JFLAGS) Props.java
+
+FetchPeerInfo.class: FetchPeerInfo.java
+	$(JCC) $(JFLAGS) FetchPeerInfo.java
 
 clean:
 	$(RM) *.class

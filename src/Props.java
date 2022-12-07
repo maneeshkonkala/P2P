@@ -23,13 +23,13 @@ class Props {
     }
 
     public int getInterval(char type) {
-        String intervalType = type == 'u' ? Constants.intervalForUnchoking : Constants.intervalForOptimisticUnchoking;
+        String intervalType = type == Constants.unchoking ? Constants.intervalForUnchoking : Constants.intervalForOptimisticUnchoking;
         int interval = this.properties.get(intervalType);
         return interval; 
     }
 
     public void setInterval(char type, int interval) {
-        String intervalType = type == 'u' ? Constants.intervalForUnchoking : Constants.intervalForOptimisticUnchoking;
+        String intervalType = type == Constants.unchoking ? Constants.intervalForUnchoking : Constants.intervalForOptimisticUnchoking;
         this.properties.put(intervalType, interval);
         return;
     }
@@ -43,18 +43,18 @@ class Props {
     }
 
     public int getSize(char type) {
-        String objectType = type == 'f' ? Constants.sizeOfFlie : Constants.sizeOfPiece;
+        String objectType = type == Constants.file ? Constants.sizeOfFlie : Constants.sizeOfPiece;
         int size = this.properties.get(objectType);
         return size;
     }
 
     public void setSize(char type, int size) {
-        String objectType = type == 'f' ? Constants.sizeOfFlie : Constants.sizeOfPiece;
+        String objectType = type == Constants.file ? Constants.sizeOfFlie : Constants.sizeOfPiece;
         this.properties.put(objectType, size);
         return;
     }
 
     public int getNumberOfPieces() {
-        return (int) Math.ceil((double) this.getSize('f') / this.getSize('p'));
+        return (int) Math.ceil((double) this.getSize(Constants.file) / this.getSize(Constants.piece));
     }
 }

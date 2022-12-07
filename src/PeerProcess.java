@@ -22,7 +22,7 @@ public class PeerProcess {
             peerSockets = new ConcurrentHashMap<>();
 
             //Setup peer specific info
-            peers = Configuration.getAllPeersInfo();
+            peers = FetchPeerInfo.getAllPeersInfo();
 
             //Create directories for to save downloaded file if they don't exist
             for (int peerId : peers.keySet()) {
@@ -30,7 +30,7 @@ public class PeerProcess {
             }
 
             //Setup common info
-            props = Configuration.getCommonProperties();
+            props = Setup.getProps();
             numberOfPieces = props.getNumberOfPieces();
             System.out.println("Number Of Preferred Neighbors : " + props.getNeighborsPreferred());
             System.out.println("Unchoking Interval : " + props.getInterval('u') + " seconds");
@@ -42,7 +42,7 @@ public class PeerProcess {
 
 
             //Setup file specific info for this peer
-            Configuration.setThisPeerFileInfo(peers, thisPeerId, props);
+            Setup.setCurrentPeerFileInfo(peers, thisPeerId, props);
             thisPeer = peers.get(thisPeerId);
             System.out.println("Peer Id : " + thisPeerId);
             System.out.println("Host Name : " + thisPeer.getHostName());
