@@ -8,7 +8,7 @@ public class Configuration {
         LinkedHashMap<Integer, Peer> peers = new LinkedHashMap<>();
         try {
             BufferedReader peerInfo =
-                    new BufferedReader(new FileReader("Config Files/PeerInfo.cfg"));
+                    new BufferedReader(new FileReader("PeerInfo.cfg"));
             Object[] peerInfoLines = peerInfo.lines().toArray();
             for (var peerInfoLine : peerInfoLines) {
                 int peerId = Integer.parseInt(peerInfoLine.toString().split(" ")[0]);
@@ -74,7 +74,7 @@ public class Configuration {
         CommonProperties commonProperties = new CommonProperties();
         try {
             BufferedReader commonInfo =
-                    new BufferedReader(new FileReader("Config Files/Common.cfg"));
+                    new BufferedReader(new FileReader("Common.cfg"));
 
             Object[] commonLines = commonInfo.lines().toArray();
             commonProperties.setPreferredNeighbors(Integer.parseInt(commonLines[0].toString().split(" ")[1]));
