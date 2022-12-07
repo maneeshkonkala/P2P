@@ -25,12 +25,12 @@ public class Configuration {
     }
 
     static void setThisPeerFileInfo(LinkedHashMap<Integer, Peer> peers, int thisPeerId
-            , CommonProperties commonProperties) {
+            , Props props) {
         try {
             Peer thisPeer = peers.get(thisPeerId);
-            int fileSize = commonProperties.getSize('f');
-            int pieceSize = commonProperties.getSize('p');
-            int numberOfPieces = commonProperties.getNumberOfPieces();
+            int fileSize = props.getSize('f');
+            int pieceSize = props.getSize('p');
+            int numberOfPieces = props.getNumberOfPieces();
             int[] bitField = new int[numberOfPieces];
             byte[][] filePieces = new byte[numberOfPieces][];
 
@@ -41,7 +41,7 @@ public class Configuration {
 
                 //Read the file using stream and assign to fileBytes
                 BufferedInputStream file = new BufferedInputStream(new FileInputStream("peer_" + thisPeerId + File.separatorChar
-                        + commonProperties.getFileName()));
+                        + props.getFileName()));
                 byte[] fileBytes = new byte[fileSize];
                 file.read(fileBytes);
                 file.close();
@@ -70,8 +70,8 @@ public class Configuration {
         }
     }
 
-    static CommonProperties getCommonProperties() {
-        CommonProperties commonProperties = new CommonProperties();
+    static Props getCommonProperties() {
+        Props commonProperties = new Props();
         try {
             BufferedReader commonInfo =
                     new BufferedReader(new FileReader("Common.cfg"));

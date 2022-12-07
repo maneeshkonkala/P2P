@@ -23,8 +23,8 @@ LogWriter.class: LogWriter.java
 Configuration.class: Configuration.java
 	$(JCC) $(JFLAGS) Configuration.java
 
-CommonProperties.class: CommonProperties.java
-	$(JCC) $(JFLAGS) CommonProperties.java
+CommonProperties.class: Props.java
+	$(JCC) $(JFLAGS) Props.java
 
 clean:
 	$(RM) *.class

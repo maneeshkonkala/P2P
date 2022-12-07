@@ -12,7 +12,7 @@ public class PeerProcess {
     private static int thisPeerId;
     private static int numberOfPieces;
     private static Peer thisPeer;
-    private static CommonProperties commonProperties;
+    private static Props props;
     private static LinkedHashMap<Integer, Peer> peers;
     private static ConcurrentHashMap<Integer, Socket> peerSockets;
 
@@ -30,19 +30,19 @@ public class PeerProcess {
             }
 
             //Setup common info
-            commonProperties = Configuration.getCommonProperties();
-            numberOfPieces = commonProperties.getNumberOfPieces();
-            System.out.println("Number Of Preferred Neighbors : " + commonProperties.getNeighborsPreferred());
-            System.out.println("Unchoking Interval : " + commonProperties.getInterval('u') + " seconds");
-            System.out.println("Optimistic Unchoking Interval : " + commonProperties.getInterval('o') + " seconds");
-            System.out.println("File Name : " + commonProperties.getFileName());
-            System.out.println("File Size : " + commonProperties.getSize('f'));
-            System.out.println("Piece Size : " + commonProperties.getSize('p'));
+            props = Configuration.getCommonProperties();
+            numberOfPieces = props.getNumberOfPieces();
+            System.out.println("Number Of Preferred Neighbors : " + props.getNeighborsPreferred());
+            System.out.println("Unchoking Interval : " + props.getInterval('u') + " seconds");
+            System.out.println("Optimistic Unchoking Interval : " + props.getInterval('o') + " seconds");
+            System.out.println("File Name : " + props.getFileName());
+            System.out.println("File Size : " + props.getSize('f'));
+            System.out.println("Piece Size : " + props.getSize('p'));
             System.out.println("\n");
 
 
             //Setup file specific info for this peer
-            Configuration.setThisPeerFileInfo(peers, thisPeerId, commonProperties);
+            Configuration.setThisPeerFileInfo(peers, thisPeerId, props);
             thisPeer = peers.get(thisPeerId);
             System.out.println("Peer Id : " + thisPeerId);
             System.out.println("Host Name : " + thisPeer.getHostName());
@@ -150,7 +150,7 @@ public class PeerProcess {
         public void run() {
             try {
                 while (peersWithCompleteFile < peers.size()) {
-                    int preferredNeighbors = commonProperties.getNeighborsPreferred();
+                    int preferredNeighbors = props.getNeighborsPreferred();
                     ArrayList<Integer> interestedPeers = new ArrayList<>();
                     ArrayList<Integer> preferredPeers = new ArrayList<>();
 
@@ -204,7 +204,7 @@ public class PeerProcess {
                     if (!preferredPeers.isEmpty())
                         System.out.println(LogWriter.changePreferredNeighbors(preferredPeers));
 
-                    Thread.sleep(commonProperties.getInterval('u') * 1000L);
+                    Thread.sleep(props.getInterval('u') * 1000L);
                 }
             } catch (Exception e) {
 //                e.printStackTrace();
@@ -235,7 +235,7 @@ public class PeerProcess {
                     if (randomPeerId != 0)
                         System.out.println(LogWriter.changeOptimisticallyUnchokedNeighbor(randomPeerId));
 
-                    Thread.sleep(commonProperties.getInterval('o') * 1000L);
+                    Thread.sleep(props.getInterval('o') * 1000L);
                 }
             } catch (Exception e) {
 //                e.printStackTrace();
@@ -263,7 +263,7 @@ public class PeerProcess {
 
         public void checkIfCompleteFileDownloaded() {
             int parts = 0;
-            byte[] mergedFile = new byte[commonProperties.getSize('f')];
+            byte[] mergedFile = new byte[props.getSize('f')];
             for (int bit : thisPeer.getBitField()) {
                 if (bit == 1)
                     parts += 1;
@@ -280,7 +280,7 @@ public class PeerProcess {
                 }
                 try {
                     FileOutputStream fileOutputStream = new FileOutputStream("peer_" + thisPeerId + File.separatorChar
-                            + commonProperties.getFileName());
+                            + props.getFileName());
                     BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
                     bufferedOutputStream.write(mergedFile);
                     bufferedOutputStream.close();

@@ -1,11 +1,11 @@
 import java.util.*;
 
-class CommonProperties {
+class Props {
 
     String fileName;
     Map<String, Integer> properties;
 
-    public CommonProperties() {
+    public Props() {
         properties = new HashMap<>();
         properties.putIfAbsent(Constants.neighboursPreferred, 0);
         properties.putIfAbsent(Constants.intervalForUnchoking, 0);
