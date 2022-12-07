@@ -1,5 +1,7 @@
 JCC = javac
+JAVA = java
 JFLAGS = -g
+REMOTE_PEER_OPTS = -cp .:jsch.jar
 
 default: peerProcess.class
 
