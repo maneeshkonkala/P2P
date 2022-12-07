@@ -50,8 +50,8 @@ public class Messages {
 
     public static byte[] getHandshakeMessage(int peerId) {
         byte[] handShakeMessage = new byte[32];
-        byte[] header = "P2PFILESHARINGPROJ".getBytes(StandardCharsets.UTF_8);
-        byte[] zeroBits = "0000000000".getBytes(StandardCharsets.UTF_8);
+        byte[] header = Constants.handShakeHeader.getBytes(StandardCharsets.UTF_8);
+        byte[] zeroBits = Constants.zeroBitsHeader.getBytes(StandardCharsets.UTF_8);
         byte[] thisPeerId = ByteBuffer.allocate(4).putInt(peerId).array();
 
         int index = 0;
