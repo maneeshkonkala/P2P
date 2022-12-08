@@ -1,6 +1,5 @@
 import java.io.*;
 import java.net.*;
-import java.nio.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -25,7 +24,6 @@ public class PeerProcess {
             props = Setup.getProps();
             numberOfPieces = props.getNumberOfPieces();
             List<String> info = new ArrayList<>();
-            // scope for change
             info.add("Number Of Preferred Neighbors : " + props.getNeighborsPreferred());
             info.add("Unchoking Interval : " + props.getInterval('u') + " seconds");
             info.add("Optimistic Unchoking Interval : " + props.getInterval('o') + " seconds");
@@ -37,7 +35,6 @@ public class PeerProcess {
             Setup.setCurrentPeerFileInfo(peers, currentPeerId, props);
             thisPeer = peers.get(currentPeerId);
             info = new ArrayList<>();
-            // scope for change
             info.add("Peer Id : " + currentPeerId);
             info.add("Host Name : " + thisPeer.hostName);
             info.add("Port Number : " + thisPeer.port);

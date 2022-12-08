@@ -24,10 +24,8 @@ public class EstablishConnectionsWithPeers extends Thread {
                 DataInputStream input = new DataInputStream(inputStream);
                 input.readFully(data);
                 StringBuilder handshakeMsg = new StringBuilder();
-                //scope for change - copyrange separate util function
                 ByteBuffer bybuff = ByteBuffer.wrap(Arrays.copyOfRange(data, 28, 32));
                 int peerId = bybuff.getInt();
-                //scope for change
                 handshakeMsg.append(new String(Arrays.copyOfRange(data, 0, 28)));
                 handshakeMsg.append(peerId);
                 info = new ArrayList<>();
