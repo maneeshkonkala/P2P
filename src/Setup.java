@@ -31,9 +31,9 @@ public class Setup {
             int[] bitField = new int[numberOfPieces];
             byte[][] filePieces = new byte[numberOfPieces][];
 
-            if (currentPeer.hasFile()) {
+            if (currentPeer.hasFile) {
                 bitField = fillBitFiled(bitField, 1);
-                currentPeer.setBitField(bitField);
+                currentPeer.bitField = bitField;
                 String oz = Constants.peerFileNamePrefix + thisPeerId + File.separatorChar + props.getFileName();
                 FileInputStream fischal = new FileInputStream(oz);
                 BufferedInputStream file = new BufferedInputStream(fischal);
@@ -45,9 +45,9 @@ public class Setup {
             } 
             else {
                 bitField = fillBitFiled(bitField, 0);
-                currentPeer.setBitField(bitField);
+                currentPeer.bitField = bitField;
             }
-            currentPeer.setFilePieces(filePieces);
+            currentPeer.filePieces = filePieces;
         } catch (Exception e) {
             e.printStackTrace();
         }
