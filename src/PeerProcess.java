@@ -6,13 +6,13 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class PeerProcess {
-    private static int peersWithCompleteFile = 0;
-    private static int currentPeerId;
-    private static int numberOfPieces;
-    private static Peer thisPeer;
-    private static Props props;
-    private static LinkedHashMap<Integer, Peer> peers;
-    private static ConcurrentHashMap<Integer, Socket> peerSockets;
+    static int peersWithCompleteFile = 0;
+    static int currentPeerId;
+    static int numberOfPieces;
+    static Peer thisPeer;
+    static Props props;
+    static LinkedHashMap<Integer, Peer> peers;
+    static ConcurrentHashMap<Integer, Socket> peerSockets;
 
     public static void main(String[] args) {
         try {
@@ -57,42 +57,42 @@ public class PeerProcess {
         } catch (IOException e) {}
     }
 
-    static class ConnectToPeers extends Thread {
-        List<String> info;
-        public void run() {
-            byte[] inputData = new byte[32];
-            try {
-                byte[] handShakeMessage = Messages.getHandshakeMessage(currentPeerId);
-                for (Integer peerId : peers.keySet()) {
-                    if (peerId == currentPeerId)
-                        break;
-                    Peer peer = peers.get(peerId);
-                    Socket socket = new Socket(peer.hostName, peer.port);
-                    Messages.sendMessage(socket, handShakeMessage);
-                    info = new ArrayList<>();
-                    info.add(Logger.tcpConnectionMake(peerId));
-                    Utils.printInfo(info);
-                    InputStream inputStream = socket.getInputStream();
-                    DataInputStream dataInputStream = new DataInputStream(inputStream);
-                    dataInputStream.readFully(inputData);
-                    ByteBuffer bybuff = ByteBuffer.wrap(Arrays.copyOfRange(inputData, 28, 32));
-                    int receivedPeerId = bybuff.getInt();
-                    if (receivedPeerId != peerId) socket.close();
-                    else {
-                        info = new ArrayList<>();
-                        info.add(Logger.tcpConnectionMade(peerId));
-                        Utils.printInfo(info);
-                        StringBuilder handshakeMsg = new StringBuilder();
-                        String handShakeMessageFirstHalf = new String(Arrays.copyOfRange(inputData, 0, 28));
-                        handshakeMsg.append(handShakeMessageFirstHalf);
-                        handshakeMsg.append(receivedPeerId);
-                        peerSockets.put(peerId, socket);
-                        new ExchangeMessages(socket, peerId).start();
-                    }
-                }
-            } catch (Exception e) {}
-        }
-    }
+    // static class ConnectToPeers extends Thread {
+    //     List<String> info;
+    //     public void run() {
+    //         byte[] inputData = new byte[32];
+    //         try {
+    //             byte[] handShakeMessage = Messages.getHandshakeMessage(currentPeerId);
+    //             for (Integer peerId : peers.keySet()) {
+    //                 if (peerId == currentPeerId)
+    //                     break;
+    //                 Peer peer = peers.get(peerId);
+    //                 Socket socket = new Socket(peer.hostName, peer.port);
+    //                 Messages.sendMessage(socket, handShakeMessage);
+    //                 info = new ArrayList<>();
+    //                 info.add(Logger.tcpConnectionMake(peerId));
+    //                 Utils.printInfo(info);
+    //                 InputStream inputStream = socket.getInputStream();
+    //                 DataInputStream dataInputStream = new DataInputStream(inputStream);
+    //                 dataInputStream.readFully(inputData);
+    //                 ByteBuffer bybuff = ByteBuffer.wrap(Arrays.copyOfRange(inputData, 28, 32));
+    //                 int receivedPeerId = bybuff.getInt();
+    //                 if (receivedPeerId != peerId) socket.close();
+    //                 else {
+    //                     info = new ArrayList<>();
+    //                     info.add(Logger.tcpConnectionMade(peerId));
+    //                     Utils.printInfo(info);
+    //                     StringBuilder handshakeMsg = new StringBuilder();
+    //                     String handShakeMessageFirstHalf = new String(Arrays.copyOfRange(inputData, 0, 28));
+    //                     handshakeMsg.append(handShakeMessageFirstHalf);
+    //                     handshakeMsg.append(receivedPeerId);
+    //                     peerSockets.put(peerId, socket);
+    //                     new ExchangeMessages(socket, peerId).start();
+    //                 }
+    //             }
+    //         } catch (Exception e) {}
+    //     }
+    // }
 
     static class AcceptConnectionsFromPeers extends Thread {
         @Override

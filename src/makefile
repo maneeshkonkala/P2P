@@ -29,5 +29,8 @@ Props.class: Props.java
 FetchPeerInfo.class: FetchPeerInfo.java
 	$(JCC) $(JFLAGS) FetchPeerInfo.java
 
+ConnectToPeers.class: ConnectToPeers.java
+	$(JCC) $(JFLAGS) ConnectToPeers.java
+
 clean:
 	$(RM) *.class
