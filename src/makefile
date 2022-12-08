@@ -41,5 +41,8 @@ PeerUnchoker.class: PeerUnchoker.java
 OptimisticPeerUnchoker.class: OptimisticPeerUnchoker.java
 	$(JCC) $(JFLAGS) OptimisticPeerUnchoker.java
 
+MessageExchanger.class: MessageExchanger.java
+	$(JCC) $(JFLAGS) MessageExchanger.java
+
 clean:
 	$(RM) *.class
