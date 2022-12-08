@@ -192,13 +192,13 @@ public class PeerProcess {
                     }
                     for (int peerId : preferredPeers) {
                         peers.get(peerId).setChoked(false);
-                        Messages.sendMessage(peerSockets.get(peerId), Messages.getUnchokeMessage());
+                        Messages.sendMessage(peerSockets.get(peerId), Messages.getMessage(MessageTypes.UNCHOKE));
                     }
 
                     for (int peerId : interestedPeers) {
                         if (!peers.get(peerId).isChoked()) {
                             peers.get(peerId).setChoked(true);
-                            Messages.sendMessage(peerSockets.get(peerId), Messages.getChokeMessage());
+                            Messages.sendMessage(peerSockets.get(peerId), Messages.getMessage(MessageTypes.CHOKE));
                         }
                     }
                     if (!preferredPeers.isEmpty())
@@ -229,7 +229,7 @@ public class PeerProcess {
                         Random random = new Random();
                         int randomPeerIndex = random.nextInt(interestedPeers.size());
                         randomPeerId = interestedPeers.get(randomPeerIndex);
-                        Messages.sendMessage(peerSockets.get(randomPeerId), Messages.getUnchokeMessage());
+                        Messages.sendMessage(peerSockets.get(randomPeerId), Messages.getMessage(MessageTypes.UNCHOKE));
                         peers.get(randomPeerId).setChoked(false);
                     }
                     if (randomPeerId != 0)
@@ -357,7 +357,7 @@ public class PeerProcess {
                                 peers.get(peerId).setInterested(false);
                                 if (!peers.get(peerId).isChoked()) {
                                     peers.get(peerId).setChoked(true);
-                                    Messages.sendMessage(socket, Messages.getChokeMessage());
+                                    Messages.sendMessage(socket, Messages.getMessage(MessageTypes.CHOKE));
                                 }
                                 System.out.println(Logger.receivedNotInterestedMessage(peerId));
                                 break;
@@ -375,9 +375,9 @@ public class PeerProcess {
                                 }
                                 if (checkIfInteresting(thisPeer.getBitField(), peers.get(peerId).getBitField()
                                         , thisPeer.getBitField().length))
-                                    Messages.sendMessage(socket, Messages.getInterestedMessage());
+                                    Messages.sendMessage(socket, Messages.getMessage(MessageTypes.INTERESTED));
                                 else
-                                    Messages.sendMessage(socket, Messages.getNotInterestedMessage());
+                                    Messages.sendMessage(socket, Messages.getMessage(MessageTypes.NOTINTERESTED));
 
                                 System.out.println(Logger.receivedHaveMessage(peerId, pieceIndex));
                                 System.out.println((new Date()) + " : Bitfield for peer " + peerId + " updated to "
@@ -407,9 +407,9 @@ public class PeerProcess {
 
                                 if (checkIfInteresting(thisPeer.getBitField(), peers.get(peerId).getBitField()
                                         , thisPeer.getBitField().length))
-                                    Messages.sendMessage(socket, Messages.getInterestedMessage());
+                                    Messages.sendMessage(socket, Messages.getMessage(MessageTypes.INTERESTED));
                                 else
-                                    Messages.sendMessage(socket, Messages.getNotInterestedMessage());
+                                    Messages.sendMessage(socket, Messages.getMessage(MessageTypes.NOTINTERESTED));
                                 break;
                             case MessageTypes.REQUEST:
                                 pieceIndex = ByteBuffer.wrap(message).getInt();
