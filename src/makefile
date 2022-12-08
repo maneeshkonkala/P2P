@@ -38,5 +38,8 @@ EstablishConnectionsWithPeers.class: EstablishConnectionsWithPeers.java
 PeerUnchoker.class: PeerUnchoker.java
 	$(JCC) $(JFLAGS) PeerUnchoker.java
 
+OptimisticPeerUnchoker.class: OptimisticPeerUnchoker.java
+	$(JCC) $(JFLAGS) OptimisticPeerUnchoker.java
+
 clean:
 	$(RM) *.class

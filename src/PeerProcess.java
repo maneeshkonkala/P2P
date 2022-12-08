@@ -49,42 +49,13 @@ public class PeerProcess {
             PeerConnector peerConnector = new PeerConnector();
             EstablishConnectionsWithPeers establishConnectionsWithPeers = new EstablishConnectionsWithPeers();
             PeerUnchoker peerUnchoking = new PeerUnchoker();
-            OptimisticallyUnchokePeers optimisticallyUnchokePeers = new OptimisticallyUnchokePeers();
+            OptimisticPeerUnchoker optimisticPeerUnchoker = new OptimisticPeerUnchoker();
             peerConnector.start();
             establishConnectionsWithPeers.start();
             peerUnchoking.start();
-            optimisticallyUnchokePeers.start();
+            optimisticPeerUnchoker.start();
         } catch (IOException e) {}
     }
-    static class OptimisticallyUnchokePeers extends Thread {
-        @Override
-        public void run() {
-            try {
-                while (peersWithCompleteFile < peers.size()) {
-                    int randomPeerId = 0;
-                    ArrayList<Integer> interestedPeers = new ArrayList<>();
-
-                    for (int peerId : peerSockets.keySet()) {
-                        if (peers.get(peerId).isInterested && peers.get(peerId).isChoked)
-                            interestedPeers.add(peerId);
-                    }
-
-                    if (!interestedPeers.isEmpty()) {
-                        Random random = new Random();
-                        int randomPeerIndex = random.nextInt(interestedPeers.size());
-                        randomPeerId = interestedPeers.get(randomPeerIndex);
-                        Messages.sendMessage(peerSockets.get(randomPeerId), Messages.getMessage(MessageTypes.UNCHOKE));
-                        peers.get(randomPeerId).isChoked = false;
-                    }
-                    if (randomPeerId != 0)
-                        System.out.println(Logger.changeOptilyUnchokedNeighbour(randomPeerId));
-
-                    Thread.sleep(props.getInterval('o') * 1000L);
-                }
-            } catch (Exception e) {}
-        }
-    }
-
     static class ExchangeMessages extends Thread {
         private Socket socket;
         private final int peerId;
