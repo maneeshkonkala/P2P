@@ -46,7 +46,7 @@ public class Logger {
         return s;
     }
 
-    public static String changePrefNeighbours(ArrayList<Integer> neighbors) {
+    public static String changePrefNeighbours(List<Integer> neighbors) {
         String s = "";
         StringBuffer sb = new StringBuffer();
         try {

@@ -47,109 +47,15 @@ public class PeerProcess {
             peersWithCompleteFile += thisPeer.hasFile ? 1 : 0;
             Logger.startLogger(currentPeerId);
             PeerConnector peerConnector = new PeerConnector();
-            AcceptConnectionsFromPeers acceptConnectionsFromPeers = new AcceptConnectionsFromPeers();
-            UnchokePeers unchokePeers = new UnchokePeers();
+            EstablishConnectionsWithPeers establishConnectionsWithPeers = new EstablishConnectionsWithPeers();
+            PeerUnchoker peerUnchoking = new PeerUnchoker();
             OptimisticallyUnchokePeers optimisticallyUnchokePeers = new OptimisticallyUnchokePeers();
             peerConnector.start();
-            acceptConnectionsFromPeers.start();
-            unchokePeers.start();
+            establishConnectionsWithPeers.start();
+            peerUnchoking.start();
             optimisticallyUnchokePeers.start();
         } catch (IOException e) {}
     }
-    // static class AcceptConnectionsFromPeers extends Thread {
-    //     @Override
-    //     public void run() {
-    //         byte[] data = new byte[32];
-    //         try {
-    //             byte[] handShakeMessage = Messages.getHandshakeMessage(currentPeerId);
-    //             Peer peer = peers.get(currentPeerId);
-    //             ServerSocket serverSocket = new ServerSocket(peer.port);
-    //             //While loop runs peers.size() - 1 times because we want to connect to all other peers
-    //             while (peerSockets.size() < peers.size() - 1) {
-    //                 Socket socket = serverSocket.accept();
-    //                 DataInputStream input = new DataInputStream(socket.getInputStream());
-    //                 input.readFully(data);
-    //                 StringBuilder handshakeMsg = new StringBuilder();
-    //                 int peerId = ByteBuffer.wrap(Arrays.copyOfRange(data, 28, 32)).getInt();
-    //                 handshakeMsg.append(new String(Arrays.copyOfRange(data, 0, 28)));
-    //                 handshakeMsg.append(peerId);
-    //                 System.out.println(Logger.tcpConnectionMade(peerId));
-    //                 //Sending handshake message to connected peer
-    //                 Messages.sendMessage(socket, handShakeMessage);
-    //                 System.out.println(Logger.tcpConnectionMake(peerId));
-    //                 new ExchangeMessages(socket, peerId).start();
-    //                 peerSockets.put(peerId, socket);
-    //             }
-    //             serverSocket.close();
-    //         } catch (Exception e) {}
-    //     }
-    // }
-
-    static class UnchokePeers extends Thread {
-        @Override
-        public void run() {
-            try {
-                while (peersWithCompleteFile < peers.size()) {
-                    int preferredNeighbors = props.getNeighborsPreferred();
-                    ArrayList<Integer> interestedPeers = new ArrayList<>();
-                    ArrayList<Integer> preferredPeers = new ArrayList<>();
-
-                    for (int peerId : peerSockets.keySet()) {
-                        if (peers.get(peerId).isInterested)
-                            interestedPeers.add(peerId);
-                    }
-
-                    if (interestedPeers.size() <= preferredNeighbors)
-                        preferredPeers.addAll(interestedPeers);
-
-                    else {
-                        if (thisPeer.hasFile) {
-                            Random random = new Random();
-                            int randomPeerIndex;
-                            for (int i = 0; i < preferredNeighbors; i++) {
-                                randomPeerIndex = random.nextInt(interestedPeers.size());
-                                if (!preferredPeers.contains(randomPeerIndex)) {
-                                    int randomPeer = interestedPeers.get(randomPeerIndex);
-                                    preferredPeers.add(randomPeer);
-                                    interestedPeers.remove(randomPeerIndex);
-                                }
-                            }
-                        } else {
-                            for (int i = 0; i < preferredNeighbors; i++) {
-                                int maxDownloadRatePeer = interestedPeers.get(0);
-                                int maxDownloadRatePeerIndex = 0;
-                                for (int j = 1; j < interestedPeers.size(); j++) {
-                                    if (peers.get(interestedPeers.get(j)).downloadRate > peers.get(maxDownloadRatePeer).downloadRate) {
-                                        maxDownloadRatePeer = interestedPeers.get(j);
-                                        maxDownloadRatePeerIndex = j;
-                                    }
-
-                                }
-                                preferredPeers.add(maxDownloadRatePeer);
-                                interestedPeers.remove(maxDownloadRatePeerIndex);
-                            }
-                        }
-                    }
-                    for (int peerId : preferredPeers) {
-                        peers.get(peerId).isChoked = false;
-                        Messages.sendMessage(peerSockets.get(peerId), Messages.getMessage(MessageTypes.UNCHOKE));
-                    }
-
-                    for (int peerId : interestedPeers) {
-                        if (!peers.get(peerId).isChoked) {
-                            peers.get(peerId).isChoked = true;
-                            Messages.sendMessage(peerSockets.get(peerId), Messages.getMessage(MessageTypes.CHOKE));
-                        }
-                    }
-                    if (!preferredPeers.isEmpty())
-                        System.out.println(Logger.changePrefNeighbours(preferredPeers));
-
-                    Thread.sleep(props.getInterval('u') * 1000L);
-                }
-            } catch (Exception e) {}
-        }
-    }
-
     static class OptimisticallyUnchokePeers extends Thread {
         @Override
         public void run() {

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class AcceptConnectionsFromPeers extends Thread {
+public class EstablishConnectionsWithPeers extends Thread {
     List<String> info;
     public void run() {
         byte[] data = new byte[32];

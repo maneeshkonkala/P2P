@@ -32,8 +32,11 @@ FetchPeerInfo.class: FetchPeerInfo.java
 ConnectToPeers.class: ConnectToPeers.java
 	$(JCC) $(JFLAGS) ConnectToPeers.java
 
-AcceptConnectionsFromPeers.class: AcceptConnectionsFromPeers.java
-	$(JCC) $(JFLAGS) AcceptConnectionsFromPeers.java
+EstablishConnectionsWithPeers.class: EstablishConnectionsWithPeers.java
+	$(JCC) $(JFLAGS) EstablishConnectionsWithPeers.java
+
+PeerUnchoker.class: PeerUnchoker.java
+	$(JCC) $(JFLAGS) PeerUnchoker.java
 
 clean:
 	$(RM) *.class
