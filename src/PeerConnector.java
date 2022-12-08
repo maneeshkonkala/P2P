@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ConnectToPeers extends Thread {
+public class PeerConnector extends Thread {
     List<String> info;
     public void run() {
         byte[] inputData = new byte[32];

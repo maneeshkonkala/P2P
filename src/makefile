@@ -32,5 +32,8 @@ FetchPeerInfo.class: FetchPeerInfo.java
 ConnectToPeers.class: ConnectToPeers.java
 	$(JCC) $(JFLAGS) ConnectToPeers.java
 
+AcceptConnectionsFromPeers.class: AcceptConnectionsFromPeers.java
+	$(JCC) $(JFLAGS) AcceptConnectionsFromPeers.java
+
 clean:
 	$(RM) *.class
