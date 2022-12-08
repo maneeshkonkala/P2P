@@ -35,7 +35,7 @@ public class EstablishConnectionsWithPeers extends Thread {
                 Utils.printInfo(info);
                 Messages.sendMessage(socket, handShakeMessage);
                 System.out.println(Logger.tcpConnectionMake(peerId));
-                new PeerProcess.ExchangeMessages(socket, peerId).start();
+                new MessageExchanger(socket, peerId).start();
                 PeerProcess.peerSockets.put(peerId, socket);
             }
             serverSocket.close();

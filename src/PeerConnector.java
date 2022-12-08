@@ -36,7 +36,7 @@ public class PeerConnector extends Thread {
                     handshakeMsg.append(handShakeMessageFirstHalf);
                     handshakeMsg.append(receivedPeerId);
                     PeerProcess.peerSockets.put(peerId, socket);
-                    new PeerProcess.ExchangeMessages(socket, peerId).start();
+                    new MessageExchanger(socket, peerId).start();
                 }
             }
         } catch (Exception e) {}
