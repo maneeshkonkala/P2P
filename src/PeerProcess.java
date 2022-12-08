@@ -54,7 +54,7 @@ public class PeerProcess {
                 peersWithCompleteFile += 1;
 
             //Create log file for this peer
-            LogWriter.startLogger(thisPeerId);
+            Logger.startLogger(thisPeerId);
 
             //Starting all threads to start the protocol
             ConnectToPeers connectToPeers = new ConnectToPeers();
@@ -89,7 +89,7 @@ public class PeerProcess {
                     //Writing the handshake on the output stream
                     Socket socket = new Socket(peers.get(peerId).getHostName(), peers.get(peerId).getPortNumber());
                     Messages.sendMessage(socket, handShakeMessage);
-                    System.out.println(LogWriter.makeTCPConnection(peerId));
+                    System.out.println(Logger.tcpConnectionMake(peerId));
 
                     //The other peer sends a handshake message which is retrieved here
                     DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
@@ -101,7 +101,7 @@ public class PeerProcess {
                     if (receivedPeerId != peerId)
                         socket.close();
                     else {
-                        System.out.println(LogWriter.madeTCPConnection(peerId));
+                        System.out.println(Logger.tcpConnectionMade(peerId));
                         StringBuilder handshakeMsg = new StringBuilder();
                         handshakeMsg.append(new String(Arrays.copyOfRange(inputData, 0, 28)));
                         handshakeMsg.append(receivedPeerId);
@@ -132,10 +132,10 @@ public class PeerProcess {
                     int peerId = ByteBuffer.wrap(Arrays.copyOfRange(data, 28, 32)).getInt();
                     handshakeMsg.append(new String(Arrays.copyOfRange(data, 0, 28)));
                     handshakeMsg.append(peerId);
-                    System.out.println(LogWriter.madeTCPConnection(peerId));
+                    System.out.println(Logger.tcpConnectionMade(peerId));
                     //Sending handshake message to connected peer
                     Messages.sendMessage(socket, handShakeMessage);
-                    System.out.println(LogWriter.makeTCPConnection(peerId));
+                    System.out.println(Logger.tcpConnectionMake(peerId));
                     new ExchangeMessages(socket, peerId).start();
                     peerSockets.put(peerId, socket);
                 }
@@ -202,7 +202,7 @@ public class PeerProcess {
                         }
                     }
                     if (!preferredPeers.isEmpty())
-                        System.out.println(LogWriter.changePreferredNeighbors(preferredPeers));
+                        System.out.println(Logger.changePrefNeighbours(preferredPeers));
 
                     Thread.sleep(props.getInterval('u') * 1000L);
                 }
@@ -233,7 +233,7 @@ public class PeerProcess {
                         peers.get(randomPeerId).setChoked(false);
                     }
                     if (randomPeerId != 0)
-                        System.out.println(LogWriter.changeOptimisticallyUnchokedNeighbor(randomPeerId));
+                        System.out.println(Logger.changeOptilyUnchokedNeighbour(randomPeerId));
 
                     Thread.sleep(props.getInterval('o') * 1000L);
                 }
@@ -285,7 +285,7 @@ public class PeerProcess {
                     bufferedOutputStream.write(mergedFile);
                     bufferedOutputStream.close();
                     fileOutputStream.close();
-                    System.out.println(LogWriter.downloadComplete());
+                    System.out.println(Logger.totalDownloadCompleted());
                 } catch (Exception e) {
 //                    e.printStackTrace();
                 }
@@ -338,7 +338,7 @@ public class PeerProcess {
                         switch (messageType) {
                             case MessageTypes.CHOKE:
                                 peers.get(peerId).setChoked(true);
-                                System.out.println(LogWriter.choked(peerId));
+                                System.out.println(Logger.choked(peerId));
                                 break;
                             case MessageTypes.UNCHOKE:
                                 peers.get(peerId).setChoked(false);
@@ -347,11 +347,11 @@ public class PeerProcess {
 
                                 if (pieceIndex != -1)
                                     Messages.sendMessage(socket, Messages.getRequestMessage(pieceIndex));
-                                System.out.println(LogWriter.unchoked(peerId));
+                                System.out.println(Logger.unchoked(peerId));
                                 break;
                             case MessageTypes.INTERESTED:
                                 peers.get(peerId).setInterested(true);
-                                System.out.println(LogWriter.receiveInterested(peerId));
+                                System.out.println(Logger.receivedInterestedMessage(peerId));
                                 break;
                             case MessageTypes.NOTINTERESTED:
                                 peers.get(peerId).setInterested(false);
@@ -359,7 +359,7 @@ public class PeerProcess {
                                     peers.get(peerId).setChoked(true);
                                     Messages.sendMessage(socket, Messages.getChokeMessage());
                                 }
-                                System.out.println(LogWriter.receiveNotInterested(peerId));
+                                System.out.println(Logger.receivedNotInterestedMessage(peerId));
                                 break;
                             case MessageTypes.HAVE:
                                 pieceIndex = ByteBuffer.wrap(message).getInt();
@@ -379,7 +379,7 @@ public class PeerProcess {
                                 else
                                     Messages.sendMessage(socket, Messages.getNotInterestedMessage());
 
-                                System.out.println(LogWriter.receiveHave(peerId, pieceIndex));
+                                System.out.println(Logger.receivedHaveMessage(peerId, pieceIndex));
                                 System.out.println((new Date()) + " : Bitfield for peer " + peerId + " updated to "
                                         + Arrays.toString(peers.get(peerId).getBitField()));
                                 break;
@@ -436,7 +436,7 @@ public class PeerProcess {
                                 double rate = (double) (message.length + 5) / elapsedTime;
                                 peers.get(peerId).setDownloadRate(rate);
 
-                                System.out.println(LogWriter.downloadPiece(peerId, pieceIndex));
+                                System.out.println(Logger.downloadingPieceCompleted(peerId, pieceIndex));
                                 System.out.println((new Date()) + " : Bitfield for peer " + thisPeerId + " updated to "
                                         + Arrays.toString(thisPeer.getBitField()));
 

@@ -17,8 +17,8 @@ MessageTypes.class: MessageTypes.java
 Messages.class: Messages.java
 	$(JCC) $(JFLAGS) Messages.java
 
-LogWriter.class: LogWriter.java
-	$(JCC) $(JFLAGS) LogWriter.java
+Logger.class: Logger.java
+	$(JCC) $(JFLAGS) Logger.java
 
 Setup.class: Setup.java
 	$(JCC) $(JFLAGS) Setup.java
