@@ -1,15 +1,13 @@
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.net.*;
+import java.nio.*;
+import java.nio.file.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 public class PeerProcess {
     private static int peersWithCompleteFile = 0;
-    private static int thisPeerId;
+    private static int currentPeerId;
     private static int numberOfPieces;
     private static Peer thisPeer;
     private static Props props;
@@ -18,101 +16,81 @@ public class PeerProcess {
 
     public static void main(String[] args) {
         try {
-            thisPeerId = Integer.parseInt(args[0]);
+            currentPeerId = Integer.parseInt(args[0]);
             peerSockets = new ConcurrentHashMap<>();
-
-            //Setup peer specific info
             peers = FetchPeerInfo.getAllPeersInfo();
-
-            //Create directories for to save downloaded file if they don't exist
             for (int peerId : peers.keySet()) {
                 Files.createDirectories(Paths.get("peer_" + peerId));
             }
-
-            //Setup common info
             props = Setup.getProps();
             numberOfPieces = props.getNumberOfPieces();
-            System.out.println("Number Of Preferred Neighbors : " + props.getNeighborsPreferred());
-            System.out.println("Unchoking Interval : " + props.getInterval('u') + " seconds");
-            System.out.println("Optimistic Unchoking Interval : " + props.getInterval('o') + " seconds");
-            System.out.println("File Name : " + props.getFileName());
-            System.out.println("File Size : " + props.getSize('f'));
-            System.out.println("Piece Size : " + props.getSize('p'));
-            System.out.println("\n");
-
-
-            //Setup file specific info for this peer
-            Setup.setCurrentPeerFileInfo(peers, thisPeerId, props);
-            thisPeer = peers.get(thisPeerId);
-            System.out.println("Peer Id : " + thisPeerId);
-            System.out.println("Host Name : " + thisPeer.hostName);
-            System.out.println("Port Number : " + thisPeer.port);
-            System.out.println("Has Complete File : " + (thisPeer.hasFile ? "Yes" : "No"));
-            System.out.println("\n");
-
-            if (thisPeer.hasFile)
-                peersWithCompleteFile += 1;
-
-            //Create log file for this peer
-            Logger.startLogger(thisPeerId);
-
-            //Starting all threads to start the protocol
+            List<String> info = new ArrayList<>();
+            // scope for change
+            info.add("Number Of Preferred Neighbors : " + props.getNeighborsPreferred());
+            info.add("Unchoking Interval : " + props.getInterval('u') + " seconds");
+            info.add("Optimistic Unchoking Interval : " + props.getInterval('o') + " seconds");
+            info.add("File Name : " + props.getFileName());
+            info.add("File Size : " + props.getSize('f'));
+            info.add("Piece Size : " + props.getSize('p'));
+            info.add("\n");
+            Utils.printInfo(info);
+            Setup.setCurrentPeerFileInfo(peers, currentPeerId, props);
+            thisPeer = peers.get(currentPeerId);
+            info = new ArrayList<>();
+            // scope for change
+            info.add("Peer Id : " + currentPeerId);
+            info.add("Host Name : " + thisPeer.hostName);
+            info.add("Port Number : " + thisPeer.port);
+            info.add("Has Complete File : " + (thisPeer.hasFile ? "Yes" : "No"));
+            info.add("\n");
+            Utils.printInfo(info);
+            peersWithCompleteFile += thisPeer.hasFile ? 1 : 0;
+            Logger.startLogger(currentPeerId);
             ConnectToPeers connectToPeers = new ConnectToPeers();
             AcceptConnectionsFromPeers acceptConnectionsFromPeers = new AcceptConnectionsFromPeers();
             UnchokePeers unchokePeers = new UnchokePeers();
             OptimisticallyUnchokePeers optimisticallyUnchokePeers = new OptimisticallyUnchokePeers();
-
             connectToPeers.start();
             acceptConnectionsFromPeers.start();
             unchokePeers.start();
             optimisticallyUnchokePeers.start();
-        } catch (Exception e) {
-//            e.printStackTrace();
-        }
+        } catch (IOException e) {}
     }
 
     static class ConnectToPeers extends Thread {
-        @Override
+        List<String> info;
         public void run() {
             byte[] inputData = new byte[32];
             try {
-                byte[] handShakeMessage = Messages.getHandshakeMessage(thisPeerId);
-
-                //Iterate through the peers hashmap
-                for (int peerId : peers.keySet()) {
-
-                    //We break here because we only want to connect to peers started before this peer. If this peer is
-                    // 1003 we only want to connect to 1001 and 1002. When the loop reaches 1003 we break
-                    if (peerId == thisPeerId)
+                byte[] handShakeMessage = Messages.getHandshakeMessage(currentPeerId);
+                for (Integer peerId : peers.keySet()) {
+                    if (peerId == currentPeerId)
                         break;
-
-                    //Writing the handshake on the output stream
                     Peer peer = peers.get(peerId);
                     Socket socket = new Socket(peer.hostName, peer.port);
                     Messages.sendMessage(socket, handShakeMessage);
-                    System.out.println(Logger.tcpConnectionMake(peerId));
-
-                    //The other peer sends a handshake message which is retrieved here
-                    DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+                    info = new ArrayList<>();
+                    info.add(Logger.tcpConnectionMake(peerId));
+                    Utils.printInfo(info);
+                    InputStream inputStream = socket.getInputStream();
+                    DataInputStream dataInputStream = new DataInputStream(inputStream);
                     dataInputStream.readFully(inputData);
-                    int receivedPeerId = ByteBuffer.wrap(Arrays.copyOfRange(inputData, 28, 32)).getInt();
-
-                    //This is the check that is mentioned in the project description. If the peer id is different
-                    //from the one we connected to , we close the socket
-                    if (receivedPeerId != peerId)
-                        socket.close();
+                    ByteBuffer bybuff = ByteBuffer.wrap(Arrays.copyOfRange(inputData, 28, 32));
+                    int receivedPeerId = bybuff.getInt();
+                    if (receivedPeerId != peerId) socket.close();
                     else {
-                        System.out.println(Logger.tcpConnectionMade(peerId));
+                        info = new ArrayList<>();
+                        info.add(Logger.tcpConnectionMade(peerId));
+                        Utils.printInfo(info);
                         StringBuilder handshakeMsg = new StringBuilder();
-                        handshakeMsg.append(new String(Arrays.copyOfRange(inputData, 0, 28)));
+                        String handShakeMessageFirstHalf = new String(Arrays.copyOfRange(inputData, 0, 28));
+                        handshakeMsg.append(handShakeMessageFirstHalf);
                         handshakeMsg.append(receivedPeerId);
                         peerSockets.put(peerId, socket);
                         new ExchangeMessages(socket, peerId).start();
                     }
                 }
-            } catch (Exception e) {
-//                e.printStackTrace();
-            }
+            } catch (Exception e) {}
         }
     }
 
@@ -121,8 +99,8 @@ public class PeerProcess {
         public void run() {
             byte[] data = new byte[32];
             try {
-                byte[] handShakeMessage = Messages.getHandshakeMessage(thisPeerId);
-                Peer peer = peers.get(thisPeerId);
+                byte[] handShakeMessage = Messages.getHandshakeMessage(currentPeerId);
+                Peer peer = peers.get(currentPeerId);
                 ServerSocket serverSocket = new ServerSocket(peer.port);
                 //While loop runs peers.size() - 1 times because we want to connect to all other peers
                 while (peerSockets.size() < peers.size() - 1) {
@@ -141,9 +119,7 @@ public class PeerProcess {
                     peerSockets.put(peerId, socket);
                 }
                 serverSocket.close();
-            } catch (Exception e) {
-//                e.printStackTrace();
-            }
+            } catch (Exception e) {}
         }
     }
 
@@ -208,9 +184,7 @@ public class PeerProcess {
 
                     Thread.sleep(props.getInterval('u') * 1000L);
                 }
-            } catch (Exception e) {
-//                e.printStackTrace();
-            }
+            } catch (Exception e) {}
         }
     }
 
@@ -239,9 +213,7 @@ public class PeerProcess {
 
                     Thread.sleep(props.getInterval('o') * 1000L);
                 }
-            } catch (Exception e) {
-//                e.printStackTrace();
-            }
+            } catch (Exception e) {}
         }
     }
 
@@ -281,16 +253,14 @@ public class PeerProcess {
                     }
                 }
                 try {
-                    FileOutputStream fileOutputStream = new FileOutputStream("peer_" + thisPeerId + File.separatorChar
+                    FileOutputStream fileOutputStream = new FileOutputStream("peer_" + currentPeerId + File.separatorChar
                             + props.getFileName());
                     BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
                     bufferedOutputStream.write(mergedFile);
                     bufferedOutputStream.close();
                     fileOutputStream.close();
                     System.out.println(Logger.totalDownloadCompleted());
-                } catch (Exception e) {
-//                    e.printStackTrace();
-                }
+                } catch (Exception e) {}
             }
         }
 
@@ -437,7 +407,7 @@ public class PeerProcess {
                                 peer.downloadRate = rate;
 
                                 System.out.println(Logger.downloadingPieceCompleted(peerId, pieceIndex));
-                                System.out.println((new Date()) + " : Bitfield for peer " + thisPeerId + " updated to "
+                                System.out.println((new Date()) + " : Bitfield for peer " + currentPeerId + " updated to "
                                         + Arrays.toString(thisPeer.bitField));
 
                                 checkIfCompleteFileDownloaded();
@@ -448,9 +418,7 @@ public class PeerProcess {
                         }
                     }
                     System.exit(0);
-                } catch (Exception e) {
-//                    e.printStackTrace();
-                }
+                } catch (Exception e) {}
             }
         }
     }
